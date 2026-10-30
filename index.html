@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UPDATE NIGHT｜運命のQR謎解き席替え</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Barlow+Condensed:wght@600;700&display=swap">
+<style>
+/* Layout: one phone screen, night sky; a single "ticket" card that changes state (scan → hint → solved) */
+:root{
+  --sky:#061a2b; --sky2:#0a3552; --brand:#0080b6; --ink:#f4f8fb; --muted:#9db7c9;
+  --card:#0d2c45; --line:rgba(255,255,255,.14); --gold:#ffd84d; --team:#4fc3ff;
+  --display:'Dela Gothic One','Zen Kaku Gothic New','Hiragino Sans',sans-serif;
+  --body:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif;
+  --num:'Barlow Condensed','Zen Kaku Gothic New',sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0;background:radial-gradient(120% 80% at 50% 0%,var(--sky2) 0%,var(--sky) 60%) fixed,var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+#stars{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:420px;margin:0 auto;padding-block:28px 40px;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;align-items:center;justify-content:space-between;font-family:var(--num);letter-spacing:.28em;font-size:13px;color:var(--muted)}
+.top b{color:var(--ink);font-weight:700;display:flex;align-items:center;gap:8px}
+.moon{width:14px;height:14px;border-radius:50%;box-shadow:inset -4px 2px 0 0 var(--gold);transform:rotate(-20deg)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:28px;line-height:1.35;margin:0;text-wrap:balance}
+.team{display:flex;align-items:center;gap:16px}
+.mark{flex:none;width:84px;height:84px;border-radius:20px;display:grid;place-items:center;font-size:46px;line-height:1;color:var(--team);background:rgba(255,255,255,.06);border:2px solid var(--team);box-shadow:0 0 24px -6px var(--team)}
+.team p{margin:0}
+.team .big{font-family:var(--display);font-size:22px;line-height:1.4}
+.mission{display:flex;gap:10px;align-items:flex-start;background:rgba(255,216,77,.08);border:1px dashed rgba(255,216,77,.5);border-radius:12px;padding:12px 14px;font-weight:700}
+.mission i{font-style:normal;color:var(--gold);font-family:var(--num);font-size:20px;line-height:1.2}
+.hint{position:relative;border-radius:14px;padding:22px 18px 18px;background:var(--ink);color:#0b2236;text-align:center}
+.hint small{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--gold);color:#3a2a00;font-weight:900;font-size:12px;letter-spacing:.12em;padding:3px 12px;border-radius:99px;white-space:nowrap}
+.hint q{display:block;font-family:var(--display);font-size:24px;line-height:1.45;quotes:"「" "」"}
+form{display:flex;flex-direction:column;gap:10px}
+label{font-size:13px;font-weight:700;color:var(--muted)}
+.row{display:flex;gap:8px}
+input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--ink)}
+input:focus{outline:2px solid var(--team);outline-offset:1px}
+button{font:inherit;font-weight:900;font-size:16px;padding:12px 18px;border-radius:12px;border:0;background:var(--gold);color:#3a2a00;cursor:pointer}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.msg{min-height:1.6em;margin:0;font-size:14px;color:#ffb3a8}
+.solved{text-align:center;align-items:center}
+.congrats{font-family:var(--num);font-weight:700;letter-spacing:.18em;font-size:30px;color:var(--gold);margin:0}
+.answer{margin:0;font-size:15px;color:var(--muted)}
+.answer b{color:var(--ink)}
+.seat{display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 28px;border-radius:16px;background:var(--ink);color:#0b2236}
+.seat span{font-size:13px;font-weight:700;letter-spacing:.1em}
+.seat strong{font-family:var(--num);font-size:88px;line-height:1}
+.seat em{font-style:normal;font-weight:900}
+.time{display:flex;flex-direction:column;align-items:center;gap:0;padding:12px 24px;border-radius:14px;border:2px solid var(--gold);background:rgba(255,216,77,.08)}
+.time span{font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--gold)}
+.time strong{font-family:var(--num);font-size:56px;line-height:1.05;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.time small{font-family:var(--num);font-size:14px;letter-spacing:.2em;color:var(--muted)}
+.prize{margin:0;font-weight:900;color:var(--gold);line-height:1.6}
+.foot{font-size:12px;color:var(--muted);text-align:center}
+.scanbox{width:120px;height:120px;margin:4px auto;position:relative}
+.scanbox:before,.scanbox:after{content:"";position:absolute;inset:0;border:3px solid var(--team);border-radius:10px;clip-path:polygon(0 0,30% 0,30% 6%,6% 6%,6% 30%,0 30%,0 70%,6% 70%,6% 94%,30% 94%,30% 100%,70% 100%,70% 94%,94% 94%,94% 70%,100% 70%,100% 30%,94% 30%,94% 6%,70% 6%,70% 0)}
+.scanbox i{position:absolute;left:10%;right:10%;height:2px;background:var(--gold);top:50%;box-shadow:0 0 12px var(--gold);animation:scan 2.2s ease-in-out infinite}
+@keyframes scan{0%,100%{top:18%}50%{top:82%}}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
+@media (prefers-reduced-motion:reduce){.scanbox i{animation:none}}
+</style></head><body>
+<canvas id="stars" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<main>
+  <div class="top"><b><span class="moon"></span>UPDATE NIGHT 2026</b><span>11.06</span></div>
+
+  <section class="card" id="v-start">
+    <div class="eyebrow">運命のQR謎解き席替え</div>
+    <h1>名札の裏のQRコードを読み取ってください</h1>
+    <div class="scanbox"><i></i></div>
+    <p style="margin:0;color:var(--muted)">自分のQRを読み取ると、チームのマークと秘密のヒントが表示されます。</p>
+  </section>
+
+  <section class="card" id="v-hint" hidden>
+    <div class="eyebrow">運命のQR謎解き席替え</div>
+    <div class="team">
+      <div class="mark" id="mark">◆</div>
+      <div><p class="eyebrow">YOUR TEAM</p><p class="big">あなたは「<span id="mark2">◆</span>」チームです</p></div>
+    </div>
+    <div class="mission"><i>×3</i><span>同じマークを持つ仲間を3人探してください。名札の裏は見せ合ってOK、ヒントは口で伝えよう。</span></div>
+    <div class="hint"><small>あなたの秘密のヒント</small><q id="hint">大阪の名物料理</q></div>
+    <form id="f" novalidate>
+      <label for="ans">4人のヒントがそろったら、答えを入力</label>
+      <div class="row"><input id="ans" name="ans" autocomplete="off" placeholder="ひらがなでもOK"><button type="submit">答える</button></div>
+      <p class="msg" id="msg" role="status"></p>
+    </form>
+  </section>
+
+  <section class="card solved" id="v-solved" hidden>
+    <p class="congrats">CONGRATULATIONS!</p>
+    <h1>謎解き成功！</h1>
+    <p class="answer">答えは <b id="answer">たこやき</b></p>
+    <div class="seat"><span>あなたたちの席は…</span><strong id="table">3</strong><em>番テーブル</em></div>
+    <div class="time"><span>正解時刻</span><strong id="ptime">19:42:07</strong><small id="pdate">2026.11.06</small></div>
+    <p class="prize">回答1位のチームには景品あり！<br>この画面をすぐ司会に見せてください</p>
+    <p style="margin:0;font-weight:700">そのあと、4人で新しい席へ移動してください！</p>
+  </section>
+
+  <section class="card" id="v-bad" hidden>
+    <div class="eyebrow">読み取りエラー</div>
+    <h1>このQRコードは見つかりませんでした</h1>
+    <p style="margin:0;color:var(--muted)">もう一度、自分の名札の裏のQRを読み取ってください。うまくいかないときは運営スタッフに声をかけてください。</p>
+  </section>
+
+  <p class="foot">UPDATE NIGHT ｜ 株式会社アップデート</p>
+</main>
+
+<script>
+const D=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("=0Xfd1lInG443G44CG44iACLic4gjf5gjLqgjLCIsICiDOOvDO+hDO+lDO+gDOuoCOuvkeum8S+j8WuqgauIgwiIlRXYkBXdiACLigagjz7gjfagjfbgjPagjLYgjLCIsICiDOOvDO+hDO+lDO+gDOuoCOuIbBCL0ACLiATOhdjZmNiIgwiIlmp4isFI6IiRiACLd1lIjO443K44zO44pO44zO44rK44iACLiMogjfZgjPpgjnogjPpgjvYgjLCIsIii7i+pmi+smiuIbBCLyACLiYmZ3EWOjNiIgwiIgap4isFI6ISRiACLd1lItK44kO44fO44OO44zK44qK44iACLi0YgjTogj/bgj7agjPZgjrYgjLCIsICvEe+vBOevlWuiBOuIgwiING448S45/G449Wa5KG44isFIsYDIsISNiBTZldzIiACLiIrliLyWgojIEJCIs0VXi42bv1GbsVnZiACLiM7gjz7gjD6gjv6gjX5gjLCIsIChDOusCO+sDOunDOuIgwiIkG44SG44TK44+G44iACLigInmDoumLyWgwSMgwiIzQjZ5YmZjICIsIyjXKuIbBiOiMkIgwSXdJyrCO+qCO+sDOuhDOupCOOhDOuIgwiIPG44LG44TK44mG44GG44kG44iACLiMqlpnKplrJgpLyWgwSNgwiIkRDOkZmZjICIsIShYKuIbBiOiIkIgwSXdJSarFWevtWY0JCIsISrCOOpDO+sCO+vCOuIgwiI8S45TG44fG44iACLi0YgjzLhnj7moLCIsISjBOOvEe+kBO+nBOuIgwiING44EK44TG44fG44isFIsMDIsIiZmNzYmRzIiACLiY4liLyWgojIBJyegojI0JCIs0XXi0Yil3Ikl7agj7LpnrJvk/ZgjPagj7bgjb4mpvagjPZgjPZgjzJplr4ukLCIsIiRisFI6ISeuN3MyYjIgwSXicZrlfolmbDqBO+jBOOuba+pBOunqiesLiuIgwiIGJyWgojIrdzMqd3NiACLdJCqBO+kBO+iCOemBO+jBO+rJiegAO+jBO+lBOOsWauiCOOiCOui7SuIgwiIGJyWgojI0RWOnJHciACLdJyiCOepdaOjBOepfeumAm+jBOOiCO+qBO+mDOunDOeuCOuIgwiIGJyWgojI4UTY1tmbiACLdJChBOOjCOejBOuqVeOg4SOjBOusJi+rZa+iCO+imi+pBO+kCOuuBO+oBOupBOuIgwiIFJyWgojIuZ3NuJjaiACLdJyiCOugBOOjBOurBOOhBOOp1i+qBOui4S+ixWurBO+qDO+kDOurBOOsUeehiauIgwiIFJyWgojI5UDdzF2aiACLdJyiCO+iBO+iBOuhIWOsVaegNW+qBOurBO+iCOemBOOqRWeMiACLiUkIbBiOic2c3N2ZhJCIs0lILK44XmL5rG44pO44JO44zO440K44iACLiUkIbBiOicncuNmYwJCIs0lIZG44U+L6KK44PG44jG44yG44nG44GO44zK44iACLiQkIbBiOiEWdot2ckJCIs0lILK44CG44MG44oKa62Ob5Dqb5oG44oKa6qiZ6nSa5iACLiQkIbBiOiEHeudWZ5JCIs0lIKK443G44jG44fG44MG44EO44ZO44jO44tK44iACLiQkIbBiOiI2d1pnciJCIs0lIPG448S45nG44/2p5EmY6iACLiQkIbBiOicmYz0GayJCIs0lIEG44qG44CK44kG44oG44yG44MG44NK44TG44oG44LK44EG44mG44RG44gyq5iACLiMkIbBiOicWcwpnZzICIs0lILK44MK44PK44AiK6oG44LK44EG44mG44XG44NG44kG44FSa6MG44OG44VG44GG44iACLiMkIbBiOismdjF3M0ICIs0lIi2b5LK44MK44JK44LaK6RG44gG44euZ5xsagjjInmvYgjHDh0euIgwiIDJyWgojImNmMxVXciACLdJyiCOOhBO+pBO+kCO+iBOur1a+qBOuupeOnkWuIgwiIDJyWgojI652NjlzZiACLdJyiCOepFWOjBO+ltWurBOejAOeqkWOjAO+qBOejJWejQWuIgwiICJyWgojI6hGd0MnMiACLdJyiCOOhBOOjBOOmnaunle+iCO+jBOOjBO+iBmOu5WOqBO+iCO+pBOuqBOukCO+jjiurBO+s2iuIgwiICJyWgojI1QXO4Y3YiACLdJCvDO+rDO+vCOurBOOqBO+oBO+hCOeoBOebwATMVG44Yua6iACLiIkIbBiOiEGd6NjeoJCIs0lILK44CG44rG44MW55WiL5wap57O44qiZ6nSa5iACLiIkIbBiOiEWe30WZ2JCIs0lIqW55a6a5MG44KK44uG44S2Z6oG445K448O449K44iACLiEkIbBiOismZlljanJCIs0lIFC44xa45mG44PG444iL5iACLiEkIbBiOiQ2NhhXY5JCIs0lILK44EG44mG44jG44lWY5MG44pm45NG44fS55uG443Wr5rG44tiL5iACLiEkIbBiOicjaw1mN3JCIs0lIGC55Zap5pm45NCZ5uG44qiZ6nSa5iACLiEkIbBiOiEGalNmY4JyegojIwJye".split("").reverse().join("")),c=>c.charCodeAt(0))));
+const $=id=>document.getElementById(id);
+const norm=s=>(s||"").normalize("NFKC").toLowerCase().replace(/[\s　・「」『』。、！!？?]/g,"").replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
+let cur=null;
+function show(v){for(const id of["v-start","v-hint","v-solved","v-bad"])$(id).hidden=id!==v}
+function solvedKey(t){return "solved-"+t}
+function render(){
+  const tok=(location.hash||"").replace(/^#/,"").trim().toLowerCase();
+  if(!tok){show("v-start");return}
+  const p=D.p[tok]; if(!p){show("v-bad");return}
+  const t=D.t[p[0]]; cur={tok,p,t};
+  document.documentElement.style.setProperty("--team",t[1]);
+  $("mark").textContent=t[0];$("mark2").textContent=t[0];$("hint").textContent=p[1];
+  let at=null;try{at=localStorage.getItem(solvedKey(p[0]))}catch(e){}
+  if(at&&/^\d+$/.test(at)){win(false,+at)}else{show("v-hint")}
+}
+function pad(n){return String(n).padStart(2,"0")}
+function win(burst,at){
+  const d=new Date(at||Date.now());
+  $("ptime").textContent=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+  $("pdate").textContent=d.getFullYear()+"."+pad(d.getMonth()+1)+"."+pad(d.getDate());
+  $("answer").textContent=cur.t[3][0];$("table").textContent=cur.t[2];
+  show("v-solved"); if(burst) confetti();
+}
+$("f").addEventListener("submit",e=>{
+  e.preventDefault(); if(!cur) return;
+  const a=norm($("ans").value);
+  if(!a){$("msg").textContent="答えを入力してください。";return}
+  if(cur.t[3].some(x=>norm(x)===a)){
+    const now=Date.now();try{localStorage.setItem(solvedKey(cur.p[0]),String(now))}catch(e){}
+    $("msg").textContent="";win(true,now);
+  }else{$("msg").textContent="ちがうみたい。4人のヒントをもう一度合わせてみよう。";}
+});
+window.addEventListener("hashchange",render);
+render();
+
+/* stars */
+(function(){const c=$("stars"),x=c.getContext("2d");let s=[];
+function size(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;s=Array.from({length:90},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:(Math.random()*1.3+.3)*devicePixelRatio,p:Math.random()*6.28}))}
+const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function draw(t){x.clearRect(0,0,c.width,c.height);for(const a of s){x.globalAlpha=.35+.45*Math.abs(Math.sin(a.p+(still?0:t/1400)));x.fillStyle="#fff";x.beginPath();x.arc(a.x,a.y,a.r,0,7);x.fill()}if(!still)requestAnimationFrame(draw)}
+addEventListener("resize",size);size();requestAnimationFrame(draw)})();
+/* confetti */
+function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+const c=$("confetti"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+const cols=["#ffd84d","#ff9f43","#4fc3ff","#ffffff","#ff7a90"];
+const ps=Array.from({length:160},()=>({x:c.width/2,y:c.height*.35,vx:(Math.random()-.5)*12,vy:Math.random()*-12-3,w:6+Math.random()*6,h:4+Math.random()*4,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[Math.random()*cols.length|0]}));
+let f=0;(function step(){x.clearRect(0,0,c.width,c.height);for(const p of ps){p.vy+=.28;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()}if(++f<200)requestAnimationFrame(step);else x.clearRect(0,0,c.width,c.height)})()}
+</script>
+</body></html>
