@@ -55,6 +55,9 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .time span{font-size:12px;font-weight:700;letter-spacing:.2em;color:var(--gold)}
 .time strong{font-family:var(--num);font-size:56px;line-height:1.05;letter-spacing:.04em;font-variant-numeric:tabular-nums}
 .time small{font-family:var(--num);font-size:14px;letter-spacing:.2em;color:var(--muted)}
+.lead{margin:0;text-align:center;font-weight:700;line-height:1.7;font-size:15px;text-wrap:balance}
+.wide{width:100%;font-size:18px;padding:16px}
+.seat{align-self:center}
 .prize{margin:0;font-weight:900;color:var(--gold);line-height:1.6}
 .foot{font-size:12px;color:var(--muted);text-align:center}
 .scanbox{width:120px;height:120px;margin:4px auto;position:relative}
@@ -73,32 +76,34 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
     <div class="eyebrow">運命のQR謎解き席替え</div>
     <h1>名札の裏のQRコードを読み取ってください</h1>
     <div class="scanbox"><i></i></div>
-    <p style="margin:0;color:var(--muted)">自分のQRを読み取ると、チームのマークと秘密のヒントが表示されます。</p>
+    <p style="margin:0;color:var(--muted)">自分のQRを読み取ると、あなたの席が表示されます。</p>
+  </section>
+
+  <section class="card" id="v-seat" hidden>
+    <div class="eyebrow">運命のQR謎解き席替え</div>
+    <div class="seat"><span>あなたの席は…</span><strong id="table">3</strong><em>番テーブル</em></div>
+    <p class="lead">このテーブルに移動してください。<br>同じテーブルの4人がチームです。</p>
+    <div class="mission"><i>4/4</i><span>4人そろったら「次へ」を押してください。</span></div>
+    <button id="next" type="button" class="wide">4人そろった！ 次へ</button>
   </section>
 
   <section class="card" id="v-hint" hidden>
-    <div class="eyebrow">運命のQR謎解き席替え</div>
-    <div class="team">
-      <div class="mark" id="mark">◆</div>
-      <div><p class="eyebrow">YOUR TEAM</p><p class="big">あなたは「<span id="mark2">◆</span>」チームです</p></div>
-    </div>
-    <div class="mission"><i>×3</i><span>同じマークを持つ仲間を3人探してください。名札の裏は見せ合ってOK、ヒントは口で伝えよう。</span></div>
+    <div class="eyebrow">TABLE <span id="table2">3</span> ｜ 謎解きスタート</div>
     <div class="hint"><small>あなたの秘密のヒント</small><q id="hint">大阪の名物料理</q></div>
+    <p class="lead">4人とも、ちがうヒントを持っています。<br>みんなで相談して、答えを見つけよう！</p>
     <form id="f" novalidate>
-      <label for="ans">4人のヒントがそろったら、答えを入力</label>
-      <div class="row"><input id="ans" name="ans" autocomplete="off" placeholder="ひらがなでもOK"><button type="submit">答える</button></div>
+      <label for="ans">答えがわかったら入力してください</label>
+      <div class="row"><input id="ans" name="ans" autocomplete="off" placeholder="ひらがなでもOK"><button type="submit">答え合わせ</button></div>
       <p class="msg" id="msg" role="status"></p>
     </form>
   </section>
 
   <section class="card solved" id="v-solved" hidden>
     <p class="congrats">CONGRATULATIONS!</p>
-    <h1>謎解き成功！</h1>
+    <h1>正解！</h1>
     <p class="answer">答えは <b id="answer">たこやき</b></p>
-    <div class="seat"><span>あなたたちの席は…</span><strong id="table">3</strong><em>番テーブル</em></div>
-    <div class="time"><span>正解時刻</span><strong id="ptime">19:42:07</strong><small id="pdate">2026.11.06</small></div>
-    <p class="prize">回答1位のチームには景品あり！<br>この画面をすぐ司会に見せてください</p>
-    <p style="margin:0;font-weight:700">そのあと、4人で新しい席へ移動してください！</p>
+    <div class="time"><span>回答時刻</span><strong id="ptime">19:42:07</strong><small id="pdate">2026.11.06</small></div>
+    <p class="prize">この画面を運営に見せてください！<br>1位のテーブルには景品あり</p>
   </section>
 
   <section class="card" id="v-bad" hidden>
@@ -115,7 +120,7 @@ const D=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("=0Xfd1lIzJXZlh
 const $=id=>document.getElementById(id);
 const norm=s=>(s||"").normalize("NFKC").toLowerCase().replace(/[\s　・「」『』。、！!？?]/g,"").replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
 let cur=null;
-function show(v){for(const id of["v-start","v-hint","v-solved","v-bad"])$(id).hidden=id!==v}
+function show(v){for(const id of["v-start","v-seat","v-hint","v-solved","v-bad"])$(id).hidden=id!==v;scrollTo(0,0)}
 function solvedKey(t){return "solved-"+t}
 function render(){
   const tok=(location.hash||"").replace(/^#/,"").trim().toLowerCase();
@@ -123,16 +128,17 @@ function render(){
   const p=D.p[tok]; if(!p){show("v-bad");return}
   const t=D.t[p[0]]; cur={tok,p,t};
   document.documentElement.style.setProperty("--team",t[1]);
-  $("mark").textContent=t[0];$("mark2").textContent=t[0];$("hint").textContent=p[1];
+  $("table").textContent=t[2];$("table2").textContent=t[2];$("hint").textContent=p[1];
   let at=null;try{at=localStorage.getItem(solvedKey(p[0]))}catch(e){}
-  if(at&&/^\d+$/.test(at)){win(false,+at)}else{show("v-hint")}
+  let go=null;try{go=localStorage.getItem("go-"+tok)}catch(e){}
+  if(at&&/^\d+$/.test(at)){win(false,+at)}else if(go){show("v-hint")}else{show("v-seat")}
 }
 function pad(n){return String(n).padStart(2,"0")}
 function win(burst,at){
   const d=new Date(at||Date.now());
   $("ptime").textContent=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
   $("pdate").textContent=d.getFullYear()+"."+pad(d.getMonth()+1)+"."+pad(d.getDate());
-  $("answer").textContent=cur.t[3][0];$("table").textContent=cur.t[2];
+  $("answer").textContent=cur.t[3][0];
   show("v-solved"); if(burst) confetti();
 }
 $("f").addEventListener("submit",e=>{
@@ -144,6 +150,7 @@ $("f").addEventListener("submit",e=>{
     $("msg").textContent="";win(true,now);
   }else{$("msg").textContent="ちがうみたい。4人のヒントをもう一度合わせてみよう。";}
 });
+$("next").addEventListener("click",()=>{if(!cur)return;try{localStorage.setItem("go-"+cur.tok,"1")}catch(e){}show("v-hint")});
 window.addEventListener("hashchange",render);
 render();
 
