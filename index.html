@@ -316,7 +316,7 @@ function showReveal(r,t,lead){
   Object.assign(RV,{p:0,hold:false,done:false,ang:0,last:0,t0:performance.now(),idx:0,tick:0,list:leaders(r),r,t,lead});
   $("rvRound").textContent="ROUND "+two(r);$("rvAfter").hidden=true;$("rvPrompt").style.display="";$("rvStage").querySelector(".trk").getAnimations().forEach(x=>x.cancel());$("rvReel").textContent="— — —";
   const prg=$("rvPrg");prg.getAnimations().forEach(x=>x.cancel());$("rvBar").style.width="0";prg.style.strokeDasharray=CIRC;prg.style.strokeDashoffset=CIRC;prg.style.stroke="";prg.style.opacity="";
-  for(const id of["rvUp","rvBL","rvBR","rvNum","rvReel","rvPrompt","rvWord","rvFam","rvDot"]){const e=$(id);e.getAnimations().forEach(a=>a.cancel());e.style.opacity="";e.style.transform="";e.style.filter=""}
+  for(const id of["rvUp","rvBL","rvBR","rvNum","rvReel","rvPrompt","rvWord","rvFam","rvDot"]){const e=$(id);e.getAnimations().forEach(a=>a.cancel());e.style.opacity="";e.style.transform="";e.style.filter="";e.style.rotate="";e.style.scale=""}
   $("rvPrompt").textContent="マークを長押しして、席を発表";$("rvPrompt").classList.remove("pulse");
   const E="cubic-bezier(.2,.8,.2,1)",F={fill:"forwards"};
   if(reduce){for(const id of["rvUp","rvReel","rvPrompt","rvWord","rvFam"])$(id).style.opacity=1;$("rvDot").style.opacity=0}
@@ -337,7 +337,7 @@ function rvLoop(now){
   if(!RV.done){
     RV.p=Math.max(0,Math.min(1,RV.p+(RV.hold?dt/(reduce?.6:1.7):-dt/.55)));
     const p=RV.p,sp=reduce?0:(24+1300*p*p);RV.ang=(RV.ang+sp*dt)%360;
-    if(RV.ang||p)$("rvUp").style.transform=`translate(-50%,-50%) rotate(${RV.ang}deg) scale(${1+.07*p})`;
+    $("rvUp").style.rotate=RV.ang.toFixed(1)+"deg";$("rvUp").style.scale=String(1+.07*p);
     $("rvPrg").style.strokeDashoffset=CIRC*(1-p);$("rvBar").style.width=(p*100)+"%";
     if(p>0){RV.tick+=dt*1000;const iv=170-140*p;if(RV.tick>iv){RV.tick=0;RV.idx=(RV.idx+1)%RV.list.length;const[t,l]=RV.list[RV.idx];$("rvReel").textContent=two(t)+"　"+l+"卓";$("rvReel").style.filter=`blur(${(p*2.2).toFixed(1)}px)`;if(RV.hold&&navigator.vibrate)try{navigator.vibrate(6)}catch(e){}}}
     else $("rvReel").style.filter="";
@@ -364,7 +364,7 @@ function rvReveal(){
     if(!reduce){ids.forEach((id,i)=>{const d=before[i]-$(id).getBoundingClientRect().top;if(d)$(id).parentNode&&$(id).animate([{translate:"0 "+d+"px"},{translate:"0 0"}],{duration:620,easing:"cubic-bezier(.2,.8,.2,1)"})});
       $("rvAfter").animate([{opacity:0,transform:"translateY(18px)"},{opacity:1,transform:"none"}],{duration:560,delay:120,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"})}};
   if(reduce){$("rvUp").style.opacity=0;$("rvBL").style.opacity=1;$("rvBR").style.opacity=1;$("rvBL").style.transform=`translate(-50%,-50%) translateX(${-dx}px)`;$("rvBR").style.transform=`translate(-50%,-50%) translateX(${dx}px)`;$("rvNum").style.opacity=1;after();return}
-  $("rvUp").animate([{transform:`translate(-50%,-50%) rotate(${RV.ang}deg) scale(1.07)`,opacity:1},{transform:`translate(-50%,-50%) rotate(${RV.ang+260}deg) scale(.2)`,opacity:0}],{duration:420,easing:"cubic-bezier(.5,0,.75,0)",...F});
+  $("rvUp").animate([{transform:"translate(-50%,-50%) rotate(0deg) scale(1)",opacity:1},{transform:"translate(-50%,-50%) rotate(260deg) scale(.2)",opacity:0}],{duration:420,easing:"cubic-bezier(.5,0,.75,0)",...F});
   prg.animate([{opacity:1},{opacity:0}],{duration:500,delay:250,...F});$("rvStage").querySelector(".trk").animate([{opacity:1},{opacity:0}],{duration:500,delay:250,...F});
   $("rvFlash").animate([{opacity:0},{opacity:.6,offset:.25},{opacity:0}],{duration:700,delay:330,easing:"ease-out"});
   $("rvBL").animate([{opacity:0,transform:"translate(-50%,-50%) translateX(0) scale(.6)"},{opacity:1,transform:`translate(-50%,-50%) translateX(${-dx}px) scale(1)`}],{duration:720,delay:380,easing:E,...F});
