@@ -124,7 +124,97 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .rv-family i{width:1px;height:14px;background:rgba(255,255,255,.25)}
 .rv-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,rgba(255,255,255,.9),rgba(56,170,230,.25) 40%,rgba(9,20,31,0) 70%);opacity:0;pointer-events:none}
 @media (max-height:720px){.reveal{gap:10px;overflow-y:auto}.rv-word{display:none}.rv-stage{width:min(52vw,200px)}.rv-family{display:none}.rv-lead{font-size:26px}}
+
+/* ================= LIQUID GLASS — night sky / moon ================= */
+:root{
+  --sky0:#050916;--sky1:#0a1430;--sky2:#1d2d66;--moon:#fff3cf;--gold:#ffd66b;--blue:#5cc2ff;
+  --ink:#f4f7ff;--muted:rgba(222,232,255,.66);--line:rgba(255,255,255,.16);
+  --display:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif;
+  --skygrad:radial-gradient(110% 60% at 85% -8%,rgba(64,86,170,.55) 0%,rgba(29,45,102,0) 60%),radial-gradient(90% 50% at 0% 100%,rgba(48,40,120,.45) 0%,rgba(20,20,60,0) 60%),linear-gradient(180deg,#070d24 0%,#0a1430 50%,#050916 100%);
+  color-scheme:dark;
+}
+body{background:var(--skygrad) fixed,var(--sky0);color:var(--ink)}
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.moonbg{position:absolute;top:74px;right:-86px;width:170px;height:170px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9) 0%,rgba(255,255,255,0) 32%),radial-gradient(circle at 62% 58%,rgba(214,188,120,.35) 0 9%,transparent 10%),radial-gradient(circle at 38% 66%,rgba(214,188,120,.28) 0 6%,transparent 7%),radial-gradient(circle at 70% 30%,rgba(214,188,120,.25) 0 5%,transparent 6%),radial-gradient(circle at 45% 45%,#fffaf0 0%,#ffeec2 55%,#f1d58f 100%);
+  box-shadow:0 0 50px 8px rgba(255,234,170,.3),0 0 140px 50px rgba(255,220,140,.12);opacity:.92;animation:moonfloat 9s ease-in-out infinite}
+@keyframes moonfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+.neb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55}
+.neb.n1{width:340px;height:240px;left:-120px;top:38%;background:#2b56d9}
+.neb.n2{width:300px;height:260px;right:-120px;bottom:-60px;background:#6a3fd6;opacity:.38}
+#stars{z-index:0}
+
+/* glass mixin */
+.card,.hint,.piece,.seat,.time,.mission,.bigh,.top,.ghost,.round,input,.chip,.keypad div,.rv-glass{
+  position:relative;-webkit-backdrop-filter:blur(22px) saturate(175%);backdrop-filter:blur(22px) saturate(175%)}
+.card,.rv-glass{background:linear-gradient(145deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.04) 45%,rgba(255,255,255,.08) 100%);
+  border:0;border-radius:30px;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -1px 1px rgba(255,255,255,.08),0 30px 60px -20px rgba(0,0,0,.6),0 0 0 .5px rgba(255,255,255,.08)}
+.card::before,.rv-glass::before,.hint::before,.piece::before,.seat::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(130% 70% at 12% -10%,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 45%)}
+.card::after,.rv-glass::after,.hint::after,.piece::after,.seat::after,.time::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(150deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.08) 35%,rgba(255,255,255,.02) 60%,rgba(255,255,255,.35) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+.card>*{position:relative}
+.card{padding:26px 22px;gap:18px}
+
+.top{position:relative;z-index:2;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.08);color:var(--muted)}
+.top b{color:var(--ink)}
+.top .moon{box-shadow:inset -4px 2px 0 0 var(--gold)}
+h1{font-family:var(--display);font-weight:900;font-size:25px;letter-spacing:.02em;text-shadow:0 2px 16px rgba(5,9,22,.55)}
+.eyebrow{color:var(--muted);letter-spacing:.18em}
+.round{background:rgba(255,214,107,.14);color:var(--gold);box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,214,107,.35);padding:5px 14px;letter-spacing:.24em}
+
+/* inner glass panes (were solid white) */
+.hint,.piece,.seat{background:linear-gradient(160deg,rgba(255,255,255,.2),rgba(255,255,255,.06));color:var(--ink);border-radius:22px;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -8px 20px rgba(255,255,255,.04),0 12px 30px -12px rgba(0,0,0,.5)}
+.hint{padding:30px 18px 22px}
+.hint small{background:linear-gradient(180deg,#ffe49a,#ffcc4d);color:#3a2800;box-shadow:0 4px 14px -4px rgba(255,204,77,.7),inset 0 1px 0 rgba(255,255,255,.7)}
+.hint q{font-size:21px;text-wrap:balance}
+.hint q,.piece .txt{font-family:var(--display);font-weight:900;color:var(--ink);text-shadow:0 1px 18px rgba(140,180,255,.25)}
+.piece{padding:22px 16px}
+.role{color:var(--gold)}
+.seat{color:var(--ink);padding:20px 34px}
+.seat strong{text-shadow:0 0 30px rgba(255,236,170,.45)}
+.seat span,.seat em{color:var(--muted)}
+.chip{background:rgba(8,16,40,.35);color:var(--ink);border-radius:14px;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,255,255,.12)}
+.chips .sep{color:rgba(255,255,255,.4)}
+
+.mission{background:rgba(255,214,107,.08);border:0;border-radius:18px;box-shadow:inset 0 1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,214,107,.28)}
+.mission i{color:var(--gold)}
+
+input{background:rgba(5,10,30,.35);border:0;border-radius:16px;color:var(--ink);box-shadow:inset 0 2px 6px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.14)}
+input::placeholder{color:rgba(222,232,255,.42)}
+input:focus{outline:none;box-shadow:inset 0 2px 6px rgba(0,0,0,.35),0 0 0 2px rgba(92,194,255,.75)}
+button{border-radius:999px;background:linear-gradient(180deg,#ffe7a3 0%,#ffd060 55%,#f2b93a 100%);color:#2e2000;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.85),inset 0 -2px 4px rgba(160,100,0,.25),0 10px 26px -8px rgba(255,200,80,.6);transition:transform .15s ease,box-shadow .15s ease}
+button:active{transform:scale(.97)}
+.ghost{background:rgba(255,255,255,.07);color:var(--ink);border:0;box-shadow:inset 0 1px 1px rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.14),0 10px 24px -12px rgba(0,0,0,.5)}
+.msg{color:#ffb8c2}
+
+.time{background:rgba(255,214,107,.08);border:0;border-radius:20px;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,214,107,.3)}
+.time::after{display:none}
+.congrats{font-size:24px;letter-spacing:.1em;color:var(--gold);text-shadow:0 0 24px rgba(255,214,107,.45)}
+.prize{color:var(--gold)}
+.bigh{background:rgba(255,214,107,.07);border:0;border-radius:22px;box-shadow:inset 0 1px 1px rgba(255,255,255,.35),inset 0 0 0 1px rgba(255,214,107,.35)}
+.keypad div{background:rgba(255,255,255,.07);border:0;border-radius:12px;box-shadow:inset 0 1px 1px rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.1)}
+.scanbox:before,.scanbox:after{border-color:var(--blue)}
+.foot{color:rgba(222,232,255,.45)}
+
+/* reveal overlay in the same sky */
+.reveal{background:var(--skygrad),var(--sky0)}
+.reveal::before{content:"";position:absolute;top:56px;right:-92px;width:170px;height:170px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9) 0%,rgba(255,255,255,0) 32%),radial-gradient(circle at 62% 58%,rgba(214,188,120,.35) 0 9%,transparent 10%),radial-gradient(circle at 45% 45%,#fffaf0 0%,#ffeec2 55%,#f1d58f 100%);
+  box-shadow:0 0 60px 10px rgba(255,234,170,.3),0 0 160px 60px rgba(255,220,140,.12);opacity:.9}
+.rv-stage::before{content:"";position:absolute;inset:7%;border-radius:50%;
+  background:radial-gradient(120% 120% at 30% 15%,rgba(255,255,255,.22) 0%,rgba(255,255,255,.05) 45%,rgba(255,255,255,.08) 100%);
+  -webkit-backdrop-filter:blur(18px) saturate(170%);backdrop-filter:blur(18px) saturate(170%);
+  box-shadow:inset 0 2px 2px rgba(255,255,255,.55),inset 0 -3px 10px rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.12),0 30px 60px -20px rgba(0,0,0,.7)}
+.rv-after.rv-glass{padding:22px 18px;max-width:380px}
+.rv-lead{font-family:var(--display);font-weight:900}
+.rv-family{bottom:calc(54px + env(safe-area-inset-bottom,0px))}
 </style></head><body>
+<div class="sky" aria-hidden="true"><div class="neb n1"></div><div class="neb n2"></div><div class="moonbg"></div></div>
 <canvas id="stars" aria-hidden="true"></canvas>
 <canvas id="confetti" aria-hidden="true"></canvas>
 <main>
@@ -228,7 +318,7 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   </div>
   <div class="rv-reel" id="rvReel">— — —</div>
   <p class="rv-prompt" id="rvPrompt">マークを長押しして、席を発表</p>
-  <div class="rv-after" id="rvAfter" hidden>
+  <div class="rv-after rv-glass" id="rvAfter" hidden>
     <p class="rv-lead" id="rvLead">吉次卓</p>
     <p class="rv-sub" id="rvSub">4番テーブルへ移動してください</p>
     <div class="mission" style="text-align:left"><i>GO</i><span>メンバーがそろったら「次へ」を押してください。</span></div>
