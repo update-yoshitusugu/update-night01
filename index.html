@@ -66,6 +66,25 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 @keyframes scan{0%,100%{top:18%}50%{top:82%}}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:5}
 @media (prefers-reduced-motion:reduce){.scanbox i{animation:none}}
+
+.round{display:inline-flex;align-items:center;gap:6px;font-family:var(--num);font-weight:700;letter-spacing:.2em;font-size:13px;color:#3a2a00;background:var(--gold);border-radius:99px;padding:3px 12px;align-self:flex-start}
+.role{font-size:13px;font-weight:900;letter-spacing:.12em;color:var(--gold);text-align:center;margin:0}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.chip{font-family:var(--num);font-size:40px;font-weight:700;line-height:1;padding:10px 14px;border-radius:10px;background:#0b2236;color:var(--ink);min-width:72px;text-align:center;font-variant-numeric:tabular-nums}
+.chips .sep{align-self:center;color:#7d93a3;font-size:20px}
+.piece{background:var(--ink);color:#0b2236;border-radius:14px;padding:20px 16px;display:flex;flex-direction:column;gap:12px}
+.piece .txt{font-family:var(--display);font-size:21px;line-height:1.55;text-align:center;margin:0;text-wrap:balance}
+.count{display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:700;color:var(--muted)}
+.count b{font-family:var(--num);font-size:26px;color:var(--ink);font-variant-numeric:tabular-nums}
+.bigh{border:2px solid var(--gold);background:rgba(255,216,77,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.bigh p{margin:0;font-weight:700;line-height:1.6;text-align:center}
+.bigh .tag{font-size:12px;letter-spacing:.2em;color:var(--gold);font-weight:900}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:260px;margin:0 auto;width:100%}
+.keypad div{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:8px;padding:6px 4px;text-align:center;line-height:1.2}
+.keypad b{display:block;font-family:var(--num);font-size:20px}
+.keypad span{font-size:11px;color:var(--muted)}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);width:100%}
+.next2{display:flex;flex-direction:column;gap:8px}
 </style></head><body>
 <canvas id="stars" aria-hidden="true"></canvas>
 <canvas id="confetti" aria-hidden="true"></canvas>
@@ -80,30 +99,68 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
   </section>
 
   <section class="card" id="v-seat" hidden>
-    <div class="eyebrow">運命のQR謎解き席替え</div>
-    <div class="seat"><span>あなたの席は…</span><strong id="table">3</strong><em>番テーブル</em></div>
-    <p class="lead">このテーブルに移動してください。<br>同じテーブルの4人がチームです。</p>
-    <div class="mission"><i>4/4</i><span>4人そろったら「次へ」を押してください。</span></div>
-    <button id="next" type="button" class="wide">4人そろった！ 次へ</button>
+    <span class="round" id="seatRound">ROUND 1</span>
+    <div class="seat"><span>あなたの席は…</span><strong id="table">3</strong><em id="lead">堂下卓</em></div>
+    <p class="lead">このテーブルに移動してください。<br>同じテーブルのメンバーがチームです。</p>
+    <div class="mission"><i>GO</i><span>メンバーがそろったら「次へ」を押してください。</span></div>
+    <button id="next" type="button" class="wide">そろった！ 次へ</button>
   </section>
 
-  <section class="card" id="v-hint" hidden>
-    <div class="eyebrow">TABLE <span id="table2">3</span> ｜ この社員、だれでしょう？</div>
-    <div class="hint"><small>あなたの秘密のヒント</small><q id="hint">大阪の名物料理</q></div>
-    <p class="lead">ヒントはWantedlyのプロフィールから。<br>4人のヒントを合わせて、だれか当てよう！</p>
-    <form id="f" novalidate>
-      <label for="ans">だれかわかったら、名前を入力してください</label>
-      <div class="row"><input id="ans" name="ans" autocomplete="off" placeholder="名字だけでもOK"><button type="submit">答え合わせ</button></div>
-      <p class="msg" id="msg" role="status"></p>
+  <section class="card" id="v-q1" hidden>
+    <span class="round">ROUND 1</span>
+    <div class="eyebrow">TABLE <span id="q1t">3</span> ｜ この社員、だれでしょう？</div>
+    <div class="hint"><small>あなたの秘密のヒント</small><q id="hint">…</q></div>
+    <p class="lead">ヒントはWantedlyのプロフィールから。<br>みんなのヒントを合わせて、だれか当てよう！</p>
+    <form id="f1" novalidate>
+      <label for="ans1">だれかわかったら、名前を入力してください</label>
+      <div class="row"><input id="ans1" autocomplete="off" placeholder="名字だけでもOK"><button type="submit">答え合わせ</button></div>
+      <p class="msg" id="msg1" role="status"></p>
+    </form>
+  </section>
+
+  <section class="card" id="v-q2" hidden>
+    <span class="round">ROUND 2</span>
+    <div class="eyebrow">TABLE <span id="q2t">3</span> ｜ 暗号を解読せよ</div>
+    <div class="piece"><p class="role" id="role">暗号文</p><div id="pbody"></div></div>
+    <p class="lead">メンバー全員、ちがう断片を持っています。<br>見せ合って、暗号を解こう！</p>
+    <div class="count" id="count">全員ヒントまで <b id="cd">3:00</b></div>
+    <div class="bigh" id="bigh" hidden>
+      <span class="tag">3分経過！ 全員ヒント</span>
+      <p>ガラケーの数字キーを思い出そう。<br>「4」を2回押すと「ち」になります。</p>
+      <div class="keypad"><div><b>1</b><span>あいうえお</span></div><div><b>2</b><span>かきくけこ</span></div><div><b>3</b><span>さしすせそ</span></div><div><b>4</b><span>たちつてと</span></div><div><b>5</b><span>なにぬねの</span></div><div><b>6</b><span>はひふへほ</span></div><div><b>7</b><span>まみむめも</span></div><div><b>8</b><span>やゆよ</span></div><div><b>9</b><span>らりるれろ</span></div></div>
+    </div>
+    <form id="f2" novalidate>
+      <label for="ans2">解読できたら、答えを入力してください</label>
+      <div class="row"><input id="ans2" autocomplete="off" placeholder="ひらがなでOK"><button type="submit">答え合わせ</button></div>
+      <p class="msg" id="msg2" role="status"></p>
     </form>
   </section>
 
   <section class="card solved" id="v-solved" hidden>
+    <span class="round" id="solvedRound" style="align-self:center">ROUND 1</span>
     <p class="congrats">CONGRATULATIONS!</p>
     <h1>正解！</h1>
-    <p class="answer">答えは <b id="answer">たこやき</b> さん</p>
+    <p class="answer">答えは <b id="answer">…</b></p>
     <div class="time"><span>回答時刻</span><strong id="ptime">19:42:07</strong><small id="pdate">2026.11.06</small></div>
-    <p class="prize">この画面を運営に見せてください！<br>1位のテーブルには景品あり</p>
+    <p class="prize" id="prize">この画面を運営に見せてください！</p>
+  </section>
+
+  <section class="card" id="v-none" hidden>
+    <span class="round" id="noneRound">ROUND 2</span>
+    <h1 id="noneTitle">今回の席はありません</h1>
+    <p style="margin:0;color:var(--muted)" id="noneText">運営スタッフに声をかけてください。</p>
+  </section>
+
+  <section class="card" id="v-pass" hidden>
+    <span class="round">ROUND 2</span>
+    <h1>2回目の合言葉を入力してください</h1>
+    <p style="margin:0;color:var(--muted)">合言葉は、司会から発表されます。</p>
+    <form id="fp" novalidate>
+      <label for="pass">合言葉</label>
+      <div class="row"><input id="pass" autocomplete="off" placeholder="カタカナでOK"><button type="submit">2回目へ</button></div>
+      <p class="msg" id="msgp" role="status"></p>
+    </form>
+    <button type="button" class="ghost" id="back1">1回目の画面にもどる</button>
   </section>
 
   <section class="card" id="v-bad" hidden>
@@ -112,48 +169,75 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
     <p style="margin:0;color:var(--muted)">もう一度、自分の名札の裏のQRを読み取ってください。うまくいかないときは運営スタッフに声をかけてください。</p>
   </section>
 
+  <div class="next2" id="go2" hidden><button type="button" class="ghost" id="toPass">2回目に進む（合言葉を入力）</button></div>
+
   <p class="foot">UPDATE NIGHT ｜ 株式会社アップデート</p>
 </main>
-
 <script>
-const D=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("==Qf91VXiYogj7bgjLCIsICoBO+jBOuiBOuIgwiIGK44+G44gG44PG44KG44iACLis4jlvrupLCIsICsUeeplWuIgwiIL+Y57qb6wS55lWa5iACLis4jlvrupDCsUeeplWuIbBCL3ACLiQGN4QmZmNiIgwiIFip4isFI6IyRiACLd1lIqG44CK44CK44iACLicZgjvagj7bgjTYgjLCIsIiqBOugCOugCO+lBO+qBOuvBOOhBOuIgwiIIWa5DGq5iACLi8bpor4ukLCIsICilW+gha+vliui7SuIgwiIIWa5DGq5g8bpor4ukLyWgwiNgwiImZ2NhlzYjICIsICoWKuIbBiOiYkIgwSXdJylBOOiCOuIgwiIEG44JK44PG44VG44iACLicZgjjogjTYgjnogj/YgjXZgjLCIsIChWWuIgwiIVqL5cGq5iACLiQollXpukzZomLCIsISl6S+urauIgwiIEaZ5VqL57uq5iACLiQollDSl6S+urauIbBCL1ACLiMDNmljZmNiIgwiIPep4isFI6ISRiACLd1lIEG44GK44iACLiQogj/bgjnZgjLCIsIChBOuhCOOhCO+vBOemBOuIgwiIjGK6a+p5iACLicLso3qgnLCIsIyohiumfa+twierCeuIgwiIjGK6a+p5gcLso3qgnLyWgwCNgwiImZmZmZmZjICIsIipcKuIbBiOiQkIgwSXdJChBO+mBOuhBOehCOuiCOuIgwiIuG44KG44iACLiQYgjvZgjbYgjXogjrogj7agjrYgjLCIsIynUeuhamuIgwiIOeY6PCb5iACLi8Jlnbomp74hp/IslLCIsIynUeuhamOIOeY6PCb5isFIsMDIsIiZmNzYmRzIiACLiY4liLyWgojIDJCIs0VXiQYgjjbgjbYgjjogjLCIsIyiCOuvBOerBO+iBOuIgwiIEG444G44GG44IK44LK44+G44tG44LG44iACLiMbul3bmpLCIsICu4SekHmuIgwiIzmb59mZ64iL5ReY6iACLiMbul3bmpDCu4SekHmuIbBCLyACLiATOhdjZmNiIgwiIlmp4isFI6IiQiACLd1lING44XG44IK44iACLi8Zgj/agjvogjXbgjLCIsISjBO+lBOOiCO+nBO+rBO+iCOetBOuIgwiI0KL6xeY5iACLiEZlnT6jlLCIsICtyiesHWekVeOpPWuIgwiI0KL6xeY5gEZlnT6jlLyWgwSMgwiI1IGMlV2NjICIsIisWKuIbBiOiEkI7BiOiQnIgwSfdJSjAO+iCO+nBOepda+jme+rBO+qBOOgWmuhBOekseOjAO+rBOOvDOOlDO+sCOegDO+gDO+oDOerCOuIgwiIHJyWgojIrZ3YxNDNiACLdJyjEa+l+WOjBOurBO+iCOemBOOkeauhIW+pBO+vCOOvDO+hDOukCOesUeuhQeemBO+iBOelLWukCO+g/WurBOuu6SOjBO+voeelKauIgwiIHJyWgojI3oGctZzdiACLdJSjBOevlW+pkWOjBO+UONlIgwiIHJyWgojI4UTY1tmbiACLdJCqDmuptWelzaOIm2a5nSa5/W55R+L6iACLickIbBiOiIXd3lnamJCIs0lI8O44AO448O44qO44gO448O44BO44uG445K44rO448O447K44JO44rO448O44jK44VO44vG44+G44EG44iACLiYkIbBiOiknMrdDNnJCIs0lIfG44NG44mG44XG44T2b5Fuo5CK446m55LaZ6Um75EW757O44lW55mio5LqL56qL5iACLiYkIbBiOionb3MWOnJCIs0lIiOp5cqo5rG448O44AO448O44qO44RCb50mb5Ayp5juL502q5nG44z2q5zIjIgwiIGJyWgojIhRnezoHaiACLdJSjAO+iCOegDOOrCOegAO+jBO+lBOevlaOjAO+rBOuuCOOvDOOrDOelDOegDO+gDO+oDOerCOuIgwiIGJyWgojIhVHarNHZiACLdJChBO+nBO+lBOOjBOejAOekBOuhIWuvjiuiBOurBO+mBOOu5WOjAO+pBO+i6Sel7SuIgwiIFJyWgojImFXc0NzNiACLdJyqBOOvDO+vCO+rCOeqDOOiDOeuCO+sDOOpCOurBOOiDOelDOevCOemLWerlaegAOOj+WurBOenBOuIgwiIFJyWgojIhhWZjJGeiACLdJynBOOhBOupBO+lBOukCO+q4WeuuWuj+e+pBOevDmOr6SuIgwiIFJyWgojI3pHel5mMiACLdJyq6iuuHW+kBm+t1a+lMWuIgwiIFJyWgojI1QXO4Y3YiACLdJSodaeo/SOjBOurBO+iCOOiBOui2iuiCO+l5S+pBOuoCOuoDOOvDOupDOOqBOOlhmekseugCO+obmOsbWuIgwiIEJyWgojIxhnbnVWeiACLdJit7SOMwITpXaeMSK44dO44iK44sO44GO44vG44nG443GI6NmY5iACLiQkIbBiOioHa0RzcyICIs0lI5K451AzNvG44DlURPRlIgwiIEJyWgojI552czIjNiACLdJCoBO+kCOuptWukCOunqiesLi+pBOuptW+pkWurBOutzW+g6WuIgwiIEJyWgojI0RWOnJHciACLdJSjAOeZ0FGbg82b0BiclZXZOxIgj/agjrrgjz7gjz6gjX5gjH4gjP4gjP6gj3qgjLCIsIyQisFI6IiY3VneyJmIgwSXioEVTV0rBOeSUJUTiACLiMkIbBiOiEWe30WZ2JCIs0lIfG44EG44mG44XG44SK44tWq52aZ56qL5VOr5nG44MW55tWq5BOZ5nK75WyY5iACLiMkIbBiOis2Nzo2d3ICIs0lIrqL66eY5cqb5qiZ6nSa5iACLiMkIbBiOic2c3N2ZhJCIs0lIfG44EG44mG44SG44KiL5hG44Lu65SK44rO44NO44zO44jO44BO44lJWdUV3bZdagjbIilr6hoLCIsIiQisFI6Iydy52YiBnIgwSXiQ7jm/KlmLpgjrIukX6uk7LpnDzMrG44juL5Cmp55K44zO44pO448O44qO44VO44iACLiIkIbBiOismZlljanJCIs0lINC44p2q5AiL5lep5AiL5MC44vG44JGJ6AiK6qG44NG449Wa5iACLiIkIbBiOi4md34mMqJCIs0lIrqL66eY5My55rqb51WY5iACLiIkIbBiOiQ2NhhXY5JCIs0lINC44CC44rG44JSa5c+b5fmq5oeI6MC44vG448O44UO44zK44BO44DO44jO44tK44iACLiEkIbBiOikTN0NXYrJCIs0lID+b5tiL5MG44oS55LGY6KGZ5Dqb5vG44+G44EG44iACLiEkIbBiOicmYz0GayJCIs0lI4G44IO448O44HO44XO44DO44iK44mG44MW75SK44+S65ayL5uG44KGZ5Dqb56qL5CGr5BC44LuL55S75Q2p56qL5iACLiEkIbBiOicWcwpnZzICIs0lIyOa5pKL67O44i6a5l6o5nG44rO44sO44RO44iK44vG443GI6NmY5iACLiEkIbBiOiY2YyEXdxJyegojIwJye".split("").reverse().join("")),c=>c.charCodeAt(0))));
+const D=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob("91lIoG44EG44qG44oG448O44nG443G44jG44CG44iACLiQHanlmblRXYkBXdiACLigagjTYgjragjfagjfbgjLYgjLCIsICqBOOhBOuqBO+pBO+tBOugBOuIbBiOismIgwSfd1lI4iL5xqI6iACLisogj7bgjragj/agjLyWgwiILK44+G44qG44vG44isFI6IiNiACLd1lINO44eO44OO44iO44iACLiwLvk/JnnnainLCIsISrBOuvBOurBOugCOuIbBCLi0agj7bgj7agjLogjLyWgojI1ICIs0VXiwLhnPZgj/ZgjLCIsISjBOOvEeOubiuIgwiING448S45TG44fG44iACLi0YgjTogjPZgj/ZgjLyWgwiING44EK44TG44fG44isFI6ICNiACLd1lILaK6Iyp5iACLisopojInmrYgjLCIsIyvBOejBOOpBOuiBOuIbBCLi8bgj3YgjTagjrYgjLyWgojIzICIs0VXiErgjrqgjn6gjvqgjLCIsISkBOuiBOeiCO+iBOuIbBCLiEZgjrYgjnogjvYgjLyWgojIyICIs0VXiU6spzLhnLCIsISpzmejBOOvEeuIgwiIKK44oG44NG44EK44isFIsIiiCOOqBOejBOOhCOuIbBiOiEjI7BiOiIDdiACL91VXiQYgjvZgjbYgjXogjrogjLCIsIirBOuiBOuIgwiIEG44bG44GG44FK44KK44uG44KG44iACLi8JlnbompLCIsIijHm+jwWuIgwiIfS55GqZ6OeY6PCb5iACLi8JlnbompDijHm+jwWuIbBCLi8JlnbompDijHm+jwWuIbBiOicjIgwSXdJylBOOiCOuIgwiIEG44JK44PG44VG44iACLicZgjjogjTYgjnogj/YgjXZgjLCIsIChWWuIgwiIVqL5cGq5iACLiQollXpukzZomLCIsISl6S+urauIgwiIEaZ5VqL57uq5iACLiQollDSl6S+urauIbBCLiQollDSl6S+urauIbBiOiYjIgwSXdJChCOuhBOuhCOuIgwiIuG44LG44qG44iACLiQogjbYgjbogj7agjvYgjragjLCIsIyn5SuqEWuIgwiIOeY6tiL5iACLi8ZukrKhl74hp3KukLCIsIyn5SuqEWOIOeY6tiL5isFIsIyn5SuqEWOIOeY6tiL5isFI6ISNiACLd1lIEG44GK44iACLiQogj/bgjnZgjLCIsIChBOuhCOOhCO+vBOemBOuIgwiIjGK6a+p5iACLicLso3qgnLCIsIyohiumfa+twierCeuIgwiIjGK6a+p5gcLso3qgnLyWgwiIjGK6a+p5gcLso3qgnLyWgojI0ICIs0VXiYogj7bgjLCIsICoBO+jBOuiBOuIgwiIGK44+G44gG44PG44KG44iACLis4jlvrupLCIsICsUeeplWuIgwiIL+Y57qb6wS55lWa5iACLis4jlvrupDCsUeeplWuIbBCLis4jlvrupDCsUeeplWuIbBiOiMjIgwSXdJChBOOuBOuhBOOiCOuIgwiILK44+G44tG44LG44iACLiQYgjjbgjbYgjjogjvogj7bgj3agjvYgjLCIsIys5WevZmuIgwiI4iL5ReY6iACLiMbul3bmpjLukH5hpLCIsIys5WevZmOI4iL5ReY6isFIsIys5WevZmOI4iL5ReY6isFI6IiMiACLd1lIqG44CK44CK44iACLicZgjvagj7bgjTYgjLCIsIiqBOugCOugCO+lBO+qBOuvBOOhBOuIgwiIIWa5DGq5iACLi8bpor4ukLCIsICilW+gha+vliui7SuIgwiIIWa5DGq5g8bpor4ukLyWgwiIIWa5DGq5g8bpor4ukLyWgojIxIyegojIxQnIgwSf91Vfi0IgjfZgjvogjfZgj7agjHIvv/ZgjfZgj7bgj3Ygjfagj/YgjjogjzIgj/agjjYgjTZrnLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsIyqDO+sDO+oDOOuCOurBOOiBOOlteuIgojIlx2byJyegwiI/WK6KuL5iACL2sFI6IiMyJCIs0lIfG44EG44mG44XG44SK44tWq52aZ56qL5VOr5nG44MW55tWq5BOZ5nK75WyY5iACLisYqmfKplLCIsczWgojIxInIgwiIxqI6DK55gsYqmfKplLCI6IibisHI6Iya2NWczQjIgwSfd1nINC448O44lO44LO44hO44qW55a6a5uG44LGb5SWY6FGb5MC44vG44IG44U265CC44oG44TG44AK44tqK6JK44LG44NK44M6b5vG443+Y5Xqp5iAiOikHZvJmIgwiI0hXZ0JCI6ICZul2aiACLis6gjP7gjP6gjjrgj7agjjYgjTZrnjagjnrlm/bgj3qqoLCI6ISZs9mcisHIsIyi4SuggWuIgwSMbBiOiIjciACLdJCtPa+rUaukCOui4Sep7SuvkeOMzsagjP6ukLYmmnrgjP7gjn6gjz7gjr6gjX5gjLCIsIyu+ieiAWuIgwiMbBiOiEjciACLiAZrlz5joDCsUe+liWuIgojIuJyegojI3oGctZzdiACL91Vfi0Igjralnrprl7agjrJvkHKrmzoukzIgj/agjjYgjTZrnLIgjjagjPZgjDogj3qqonogjvYgj3ogjzovl/agjf7jlfpmmLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsIyqDO+sDO+oDOOuCOurBOOiBOOlteOqBOeuWa+vBOerqiuIgojIlx2byJyegwiI76L6JCY5iACLysFI6IiMyJCIs0lIEG44fG44XG44MG44NC44RG44GiY5+OK6KG44uG44bG444mb5MC44nG44LqL5VuL5iACLi8bpor4ukLCIsYzWgojIxInIgwiIlyb5qSY5gALln/pjlLCI6IibisHI6ICO1EWdr5mIgwSfsxWduBiOiIjciACLsxWduBiOiEjciACLiQrsoH7hlDSkVeOpPWuIgojIuJyegojIyV3d5pmZiACL91VfisogjTYgjbagjfZgjjaooLpgjDblm75mlnZgjzrimLpgjz7gj3qgj7agj3ZgjHIgj/agjfZrlDblm7agjP7jl7agj3Igj3CjAOuIgojI5R2biJCIsICd4VGdiAiOiQmbptmIgwiIhGp45ap5NG44jeK6iAiOiUGbvJnI7BCLi8bpor4ukLCIsYzWgojIyInIgwSXi8ZgjTYgjbagjLZgjrIukHagjv4qnLpgjv6gj34gjP7gjP6gjH4gjXmY1RVdvl1pBOuhIWuqHiuIgwiI76L6JCY5iACLysFI6ISMyJCIsIiu6SOvamOIVqL5S2I6iAiOi4mI7BiOiknMrdDNnJCIs0XX9JSjAOuqVeumuWurBOOuKium8SOtuWOjAO+rBOOiBOOlteugAOOqBO+kBOOgCOerqieiCO+iBOejCOOj+W+rBO+tPW+laauIgojI5R2biJCIsICd4VGdiAiOiQmbptmIgwiIrO44zO44jO444K44uG44IG44U265oG445ap5/G44tqK6iAiOiUGbvJnI7BCLiALlnzoklLCIsUzWgojIyInIgwSXiI6kmzpimvagjz7gjD4gjz7gjr6gjHJslTbulDInmP6ukTbrmfagjPbrmPjMiACLisIukLIolLCIsEzWgojIxInIgwiIEaZ5gUpukv7qmLCI6IibisHI6IieudzY5cmIgwSfd1nILK44EG44mG44XG44oGK6SK448O44tK44X2a5wWp5uG44kK44/K448O44xK44BC44vG44X2a5wWp5uG44meb5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsICoRKeuWaejBO+oniuIgojIlx2byJyegwiI/WK6KuL5iACL2sFI6IiMyJCIs0lIfG44NG44mG44XG44T2b5Fuo5CK446m55LaZ6Um75EW757O44lW55mio5LqL56qL5iACLisIukLIolLCIsEzWgojIxInIgwiIjGK6a+p5gcLso3qgnLCI6IibisHI6ISY0p3M6hmIgwSfd1nILK44EG44mG44XG44oGK6SK448O44tK44X2a5wWp5uG44kK44/K448O44xK44BC44vG44X2a5wWp5uG44meb5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsICoRKeuWaejBO+oniuIgojIlx2byJyegwiIwS55MKZ5iACL1sFI6IiMyJCIs0lIfG44EG44mG44XG44SK44rib556a5O675nG449OY6sqL5iACLi8bpor4ukLCIsYzWgojIxInIgwiIIW65gUpukL7ukLCI6IibisHI6ISY1h2azRmIgwSfd1nILK44EG44mG44XG44oGK6SK44wWp5euZ5ZG448qo5SK448O44tK44uG44dG44BC44vG44X2a5wWp5uG44z+Y5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsISoRKeuWaejBO+oniuIgojIlx2byJyegwiIwS55MKZ5iACL1sFI6IiMyJCIs0lINC44LK44fG44l2p5Pa65vG44rG44AaZ6GG44Ry65MC44vG448O44UO44zK44BO44DO44jO44tK44iACLiALln/4nmLCIsMzWgojIxInIgwiI0KL6nSa5g4bukLCI6IibisHI6IiZxFHdzcjIgwSfsxWduBiOiIjciACLdJSjAOeZ0FGbg82b0BiclZXZOxIgj/agjrrgjz7gjz6gjX5gjH4gjP4gjP6gj3qgjLCIsIyipa+pkWuIgwyNbBiOiEjciACLioKplzrtmDijHmeqkWuIgojIuJyegojIhhWZjJGeiACL91Vfi0Igj7agjLogjnbgj/5op7agjrKmpfKplzIgj/agjjYgjTZrnLIgjjagjPZgjDogj3qqonogjvYgj3ogjzovl/agjf7jlfpmmLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsIyqDO+sDO+oDOOuCOurBOOiBOOlteOqBOeuWa+vBOerqiuIgojIlx2byJyegwiIhyq5JCZ5iACL0sFI6IiMyJCIs0lINC44p2q5AiL5lep5AiL5MC44vG44JGJ6AiK6qG44NG449Wa5iACLisrvonIglLCIsIzWgojIxInIgwiIL+Y57qb6gALlnXaplLCI6IibisHI6Iyd6hXZuJjIgwSfd1XXiUTL3ICIsISNtUjIgwiIx0yNiACLiQTL1IyWgojI5R2biJCIsIiclhGcpNmIgojIk5WarJCIsIyhWa+tPW+laauIgojIlx2byJyegwiIwS55MKZ5iACL1sFI6IiMyJCIs0lIrqL66eY5My55saa6k675iACLiALlnzoklLCIsUzWgojIxInIgwiIqSa5lGY5gALlnzoklLCI6IibisHI6ISN0lDO2NmIgwSfd1nIoG44TG44AK44tqK6JK44LG44NK44M6b5vG443+Y5Xqp5iAiOikHZvJmIgwiI0hXZ0JCI6ICZul2aiACLikrlm/bgj3qqoLCI6ISZs9mcisHIsIyvliui7SuIgwiNbBiOiIjciACLdJynBO+oBOOoBO+iteOg4SOvDO+qCO+gDOetCOegAOOt5WOMyQItnLCIsICsUeOjSWuIgwSNbBiOiEjciACLi8JlnbompDijHm+jwWuIgojIuJyegojIxhnbnVWeiACL91VfisogjTYgjbagjfZgjjaooLpgjDblm75mlnZgjzrimLpgjz7gj3qgj7agj3ZgjHIgj/agjfZrlDblm7agjP7jl7agj3Igj3CjAOuIgojI5R2biJCIsICd4VGdiAiOiQmbptmIgwiIhGp45ap5NG44jeK6iAiOiUGbvJnI7BCLiEKrmnIklLCIsQzWgojIyInIgwSXioEVTV0rBOeSUJUTiACLisYqmfKplLCIsczWgojIxInIgwiIXap5N6b6gALln/opnLCI6IibisHI6IieoRHNzJjIgwSfd1nILK44EG44mG44XG44oGK6SK448O44tK44X2a5wWp5uG44kK44/K448O44xK44BC44vG44X2a5wWp5uG44meb5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsICoRKeuWaejBO+oniuIgojIlx2byJyegwiIhyq5JCZ5iACL0sFI6IiMyJCIs0lING449Wa5nSa5MG44T50UiACLiALln/4nmLCIsMzWgojIxInIgwiIU+750mp5goIukTLsmLCI6IibisHI6ISeuN3MyYjIgwSfd1XXiETL0ICIsISNtIjIgwiIx0COiACLiITLyIyWgojI5R2biJCIsIiclhGcpNmIgojIk5WarJCIsIyhWa+tPW+laauIgojIlx2byJyegwiIhyq5JCZ5iACL0sFI6IiMyJCIs0lIgG44TK44m2a5SK44eqK6xuI6nG44m2a5nSa5uG442Ob5Dqb5iACLiEKrmnIklLCIsQzWgojIxInIgwiIfy55R2L5gEKrmnIklLCI6IibisHI6ICdklzZyBnIgwSfd1nILK44EG44mG44XG44oGK6SK44wWp5euZ5ZG448qo5SK448O44tK44uG44dG44BC44vG44X2a5wWp5uG44z+Y5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsISoRKeuWaejBO+oniuIgojIlx2byJyegwiILiL5CCa5iACLxsFI6IiMyJCIs0lI5K44rO448O447K44vG44+G44EG44BC44mG44MW75SK448O442K44kK44QO44JO44iK44iK44qO44jO44tK44iACLiALlnzoklLCIsUzWgojIxInIgwiIXap5lGY6ggKnmTLipLCI6IibisHI6IiY3VneyJmIgwSfd1nILK44EG44mG44XG44oGK6SK448O44tK44X2a5wWp5uG44kK44/K448O44xK44BC44vG44X2a5wWp5uG44meb5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsICoRKeuWaejBO+oniuIgojIlx2byJyegwiIwS55P+p5iACLzsFI6IiMyJCIs0lIrG448O44/K44vK44pO44IO445K44zO44kK44uG44IO44VO449K44ZuY5tWq5BC44M6b5uG44dG44iACLi8bpor4ukLCIsYzWgojIxInIgwiIuSa5y645gEbsl7ovn74hpLCI6IibisHI6ISY5dTblZnIgwSfd1nILK44EG44mG44XG44oGK6SK44wWp5euZ5ZG448qo5SK448O44tK44uG44dG44BC44vG44X2a5wWp5uG44z+Y5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsISoRKeuWaejBO+oniuIgojIlx2byJyegwiIwS55P+p5iACLzsFI6IiMyJCIs0lI8O44AO448O44qO44gO448O44BO44uG445K44rO448O447K44JO44rO448O44jK44VO44vG44+G44EG44iACLisIukLIolLCIsEzWgojIxInIgwiIzmb59mZ6ggLukH5hpLCI6IibisHI6Iya3Mja3djIgwSfd1XXiUTLxICIsIyMtQjIgwiIy0iMiACLiITL3IyWgojI5R2biJCIsIiclhGcpNmIgojIk5WarJCIsIyhWa+tPW+laauIgojIlx2byJyegwiIwS55P+p5iACLzsFI6IiMyJCIs0lIoOY6m2a5VOr5gYarlfKpl/blnH5voLCIsICsUe+jfauIgwyMbBiOiEjciACLi8JlnfKplDCsUe+jfauIgojIuJyegojInN3djdWYiACL9xGb15GI6IiMyJCIs0lIfG44EG44mG44XG44SK448O44/K44vK44pO44IO445K44zO44kK44uG44wK44zO44TO44kK44AO44QO448O44lO44tK445K44iACLiALlnzoklLCIsUzWgojIxInIgwiIDiL5fip5ggIklPrsmLCI6IibisHI6Iydy52YiBnIgwSfd1XXiETL2ICIsISMtUjIgwiIx0yNiACLiMTL5IyWgojI5R2biJCIsIiclhGcpNmIgojIk5WarJCIsIyhWa+tPW+laauIgojIlx2byJyegwiI/WK6KuL5iACL2sFI6IiMyJCIs0lIrqL66eY5TGY63Wr5XyY5iACLi8bpor4ukLCIsYzWgojIxInIgwiIIWa5DGq5g8bpor4ukLCI6IibisHI6IyamVWOqdmIgwSfd1nILK44EG44mG44XG44oGK6SK448O44tK44X2a5wWp5uG44kK44/K448O44xK44BC44vG44X2a5wWp5uG44meb5uG44NC44twIgjLCI6ISek9mYiACLiQHelRnIgojIk5WarJCIsICoRKeuWaejBO+oniuIgojIlx2byJyegwiI76L6JCY5iACLysFI6IiMyJCIs0lI5K451AzNvG44DlURPRlIgwiIhyq5JCZ5iACL0sFI6ISMyJCIsICtyiOoCaOILab50Cr5iAiOi4mI7BiOi4md34mMqJCIs0XX91lIx0iMiACLiETL5ICIsISNtEjIgwiI00iMisFI6ISek9mYiACLiIXZoBXajJCI6ICZul2aiACLicolmf7jlfpmmLCI6ISZs9mcisHIsIyu+ieiAWuIgwiMbBiOiIjciACLdJyq6iuuHWOjce+q6WetFWuIgwiI76L6JCY5iACLysFI6ISMyJCIsIisPW+s3aOI76L6JCY5iAiOi4mI7BiOiQ2NhhXY5JCIs0XX9JyiCOOhBOupBO+lBOOqhiukCOOsVaunbWemBOOvKaukCOOvDOerCOurBOenBOegAO+rBO+ltWOsVaurBO+sPWurBOejAOeLMC44iAiOikHZvJmIgwiI0hXZ0JCI6ICZul2aiACLiEakinrlm3YgjP6poLCI6ISZs9mcisHIsIyu+ieiAWuIgwiMbBiOiIjciACLdJyjEa+l+WOjBOurBO+iCOemBOOkeauhIW+pBO+vCOOvDO+hDOukCOesUeuhQeemBO+iBOelLWukCO+g/WurBOuu6SOjBO+voeelKauIgwiIwS55P+p5iACLzsFI6ISMyJCIsIiqEWOIwS55X6p5iAiOi4mI7BiOikTN0NXYrJCIs0XX9JSjAO+vBO+lBOurBO+nBOuiBOurBOOnkWurBO+ineOjAO+rBOOiBOOlteugAOOqBO+kBOOgCOerqieiCO+iBOejCOOj+W+rBO+tPW+laauIgojI5R2biJCIsICd4VGdiAiOiQmbptmIgwiIrO44zO44jO444K44uG44IG44U265oG445ap5/G44tqK6iAiOiUGbvJnI7BCLiALln/4nmLCIsMzWgojIyInIgwSXiY7ukDDMyU6lmHjkCOenDOuoCOOrDOuhDO+rBO+pBO+tBiejJWuIgwiIhyq5JCZ5iACL0sFI6ISMyJCIsIyn5SuqEWOIOeY6tiL5iAiOi4mI7BiOicmYz0GayJCIs0XX9JyiCOOhBOupBO+lBOOqhiukCOOvDOerCO+ltWOsVaurBOOpCO+vCOOvDOesCOegAO+rBO+ltWOsVaurBOup3WurBOejAOeLMC44iAiOikHZvJmIgwiI0hXZ0JCI6ICZul2aiACLiAakinrlm3YgjP6poLCI6ISZs9mcisHIsIyi4SuggWuIgwSMbBiOiIjciACLdJSodaeo/SOjBOurBO+iCOOiBOui2iuiCO+l5S+pBOuoCOuoDOOvDOupDOOqBOOlhmekseugCO+obmOsbWuIgwiIhyq5JCZ5iACL0sFI6ISMyJCIsISg1a+syWOIk6r5XKa5iAiOi4mI7BiOicWcwpnZzICIs0XX91lIx0COiACLiITLyICIsISNtQjIgwiIy0SOisFI6ISek9mYiACLiIXZoBXajJCI6ICZul2aiACLicolmf7jlfpmmLCI6ISZs9mcisHIsIyi4SuggWuIgwSMbBiOiIjciACLdJSjAO+iCOegDOOrCOegAO+jBO+lBOevlaOjAO+rBOuuCOOvDOOrDOelDOegDO+gDO+oDOerCOuIgwiILiL5CCa5iACLxsFI6ISMyJCIsISn8iOtbeOILiL5CCa5iAiOi4mI7BiOiY2YyEXdxJyegojIwJye".split("").reverse().join("")),c=>c.charCodeAt(0))));
 const $=id=>document.getElementById(id);
-const norm=s=>(s||"").normalize("NFKC").toLowerCase().replace(/[\s　・「」『』。、！!？?]/g,"").replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/(さん|くん|ちゃん|様)$/,"");
-let cur=null;
-function show(v){for(const id of["v-start","v-seat","v-hint","v-solved","v-bad"])$(id).hidden=id!==v;scrollTo(0,0)}
-function solvedKey(t){return "solved-"+t}
-function render(){
-  const tok=(location.hash||"").replace(/^#/,"").trim().toLowerCase();
-  if(!tok){show("v-start");return}
-  const p=D.p[tok]; if(!p){show("v-bad");return}
-  const t=D.t[p[0]]; cur={tok,p,t};
-  document.documentElement.style.setProperty("--team",t[1]);
-  $("table").textContent=t[2];$("table2").textContent=t[2];$("hint").textContent=p[1];
-  let at=null;try{at=localStorage.getItem(solvedKey(p[0]))}catch(e){}
-  let go=null;try{go=localStorage.getItem("go-"+tok)}catch(e){}
-  if(at&&/^\d+$/.test(at)){win(false,+at)}else if(go){show("v-hint")}else{show("v-seat")}
-}
+const norm=s=>(s||"").normalize("NFKC").toLowerCase().replace(/[\s　・「」『』。、！!？?ー\-]/g,"").replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/(さん|くん|ちゃん|様)$/,"");
+const st={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const V=["v-start","v-seat","v-q1","v-q2","v-solved","v-none","v-pass","v-bad"];
+let cur=null,timer=null,viewPass=false;
+function show(v){for(const id of V)$(id).hidden=id!==v;scrollTo(0,0)}
 function pad(n){return String(n).padStart(2,"0")}
-function win(burst,at){
-  const d=new Date(at||Date.now());
+function round(){return st.get(cur.tok+":r")==="2"?2:1}
+function render(){
+  clearInterval(timer);
+  const tok=(location.hash||"").replace(/^#/,"").trim().toLowerCase();
+  if(!tok){$("go2").hidden=true;show("v-start");return}
+  const p=D.p[tok]; if(!p){$("go2").hidden=true;show("v-bad");return}
+  cur={tok,p};
+  const r=round();
+  $("go2").hidden=(r===2||viewPass);
+  if(viewPass){show("v-pass");return}
+  const info=p["r"+r];
+  if(!info){
+    $("noneRound").textContent="ROUND "+r;
+    if(r===1){$("noneTitle").textContent="1回目の席はありません";$("noneText").textContent="運営スタッフに声をかけてください。"}
+    else{$("noneTitle").textContent="2回目の席はありません";$("noneText").textContent="今日はありがとうございました！ 気をつけてお帰りください。"}
+    show("v-none");return}
+  const [t,lead,x]=info;
+  const solved=st.get(tok+":s"+r);
+  if(solved&&/^\d+$/.test(solved)){win(r,+solved,false);return}
+  if(!st.get(tok+":go"+r)){
+    $("seatRound").textContent="ROUND "+r;$("table").textContent=t;$("lead").textContent=lead+"卓（"+t+"番テーブル）";
+    show("v-seat");return}
+  if(r===1){$("q1t").textContent=t;$("hint").textContent=x;show("v-q1");return}
+  $("q2t").textContent=t;$("role").textContent=x.role;
+  const pb=$("pbody");pb.innerHTML="";
+  if(x.kind==="cipher"){const c=document.createElement("div");c.className="chips";x.body.forEach((v,i)=>{if(i){const s=document.createElement("span");s.className="sep";s.textContent="／";c.appendChild(s)}const e=document.createElement("span");e.className="chip";e.textContent=v;c.appendChild(e)});pb.appendChild(c)}
+  else{const e=document.createElement("p");e.className="txt";e.textContent=x.body;pb.appendChild(e)}
+  let t0=st.get(tok+":t2");if(!t0){t0=String(Date.now());st.set(tok+":t2",t0)}
+  const tick=()=>{const left=Math.max(0,180-Math.floor((Date.now()-(+t0))/1000));$("cd").textContent=Math.floor(left/60)+":"+pad(left%60);const open=left===0;$("bigh").hidden=!open;$("count").hidden=open;if(open)clearInterval(timer)};
+  tick();timer=setInterval(tick,1000);show("v-q2");
+}
+function win(r,at,burst){
+  const t=cur.p["r"+r][0];const d=new Date(at);
+  $("solvedRound").textContent="ROUND "+r;
+  $("answer").textContent=r===1?D.t1[t][0]+" さん":D.t2[t][0];
   $("ptime").textContent=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
   $("pdate").textContent=d.getFullYear()+"."+pad(d.getMonth()+1)+"."+pad(d.getDate());
-  $("answer").textContent=cur.t[3][0];
-  show("v-solved"); if(burst) confetti();
+  $("prize").innerHTML=r===1?"この画面を運営に見せてください！<br>1位・2位のテーブルには景品あり":"この画面を運営に見せてください！<br>1位〜3位のテーブルには景品あり";
+  show("v-solved");if(burst)confetti();
 }
-$("f").addEventListener("submit",e=>{
-  e.preventDefault(); if(!cur) return;
-  const a=norm($("ans").value);
-  if(!a){$("msg").textContent="答えを入力してください。";return}
-  if(cur.t[3].some(x=>norm(x)===a)){
-    const now=Date.now();try{localStorage.setItem(solvedKey(cur.p[0]),String(now))}catch(e){}
-    $("msg").textContent="";win(true,now);
-  }else{$("msg").textContent="ちがうみたい。4人のヒントをもう一度合わせてみよう。";}
-});
-$("next").addEventListener("click",()=>{if(!cur)return;try{localStorage.setItem("go-"+cur.tok,"1")}catch(e){}show("v-hint")});
-window.addEventListener("hashchange",render);
+function check(r,inp,msg){
+  const t=cur.p["r"+r][0];const alts=(r===1?D.t1:D.t2)[t][1];const a=norm($(inp).value);
+  if(!a){$(msg).textContent="答えを入力してください。";return}
+  if(alts.some(x=>norm(x)===a)){const now=Date.now();st.set(cur.tok+":s"+r,String(now));$(msg).textContent="";win(r,now,true)}
+  else $(msg).textContent=r===1?"ちがうみたい。みんなのヒントをもう一度合わせてみよう。":"ちがうみたい。読む順番と押す回数をもう一度たしかめよう。";
+}
+$("f1").addEventListener("submit",e=>{e.preventDefault();if(cur)check(1,"ans1","msg1")});
+$("f2").addEventListener("submit",e=>{e.preventDefault();if(cur)check(2,"ans2","msg2")});
+$("next").addEventListener("click",()=>{if(!cur)return;st.set(cur.tok+":go"+round(),"1");render()});
+$("toPass").addEventListener("click",()=>{viewPass=true;render()});
+$("back1").addEventListener("click",()=>{viewPass=false;render()});
+$("fp").addEventListener("submit",e=>{e.preventDefault();if(!cur)return;
+  if(D.k.some(x=>norm(x)===norm($("pass").value))){st.set(cur.tok+":r","2");viewPass=false;$("msgp").textContent="";render()}
+  else $("msgp").textContent="合言葉がちがいます。司会の発表を待ってください。"});
+window.addEventListener("hashchange",()=>{viewPass=false;render()});
 render();
-
 /* stars */
 (function(){const c=$("stars"),x=c.getContext("2d");let s=[];
 function size(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;s=Array.from({length:90},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:(Math.random()*1.3+.3)*devicePixelRatio,p:Math.random()*6.28}))}
