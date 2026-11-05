@@ -147,8 +147,8 @@ button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
   <section class="card" id="v-none" hidden>
     <span class="round" id="noneRound">ROUND 2</span>
-    <h1 id="noneTitle">今回の席はありません</h1>
-    <p style="margin:0;color:var(--muted)" id="noneText">運営スタッフに声をかけてください。</p>
+    <h1 id="noneTitle">イベントの用意がございません</h1>
+    <p style="margin:0;color:var(--muted)" id="noneText">運営に確認してください。</p>
   </section>
 
   <section class="card" id="v-pass" hidden>
@@ -195,8 +195,7 @@ function render(){
   const info=p["r"+r];
   if(!info){
     $("noneRound").textContent="ROUND "+r;
-    if(r===1){$("noneTitle").textContent="1回目の席はありません";$("noneText").textContent="運営スタッフに声をかけてください。"}
-    else{$("noneTitle").textContent="2回目の席はありません";$("noneText").textContent="今日はありがとうございました！ 気をつけてお帰りください。"}
+    $("noneTitle").textContent="イベントの用意がございません";$("noneText").textContent="運営に確認してください。";
     show("v-none");return}
   const [t,lead,x]=info;
   const solved=st.get(tok+":s"+r);
